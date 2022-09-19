@@ -1,56 +1,66 @@
 use rand::Rng;
+use num_bigint::{BigUint, RandBigInt};
+use num_traits::cast::ToPrimitive;
+use num_traits::identities::{Zero};
 
-pub fn gen_curve(n: &u32) -> Vec<[u32; 2]> {
-    let p: u32 = (*n).clone();
-    let coeffs: [u32; 2] = get_coeffs(&p);
-    let squares: Vec<Vec<u32>> = get_squares(&p);
 
+pub fn gen_curve(n: BigUint) -> Vec<[BigUint; 2]> {
+    let p: BigUint = n.clone();
+    let coeffs: [BigUint; 2] = get_coeffs(&p);
+    let squares: Vec<Vec<BigUint>> = get_squares(&p);
+    
     get_curve(&p, coeffs, squares)
 }
 
-fn get_coeffs(p: &u32) -> [u32; 2] {
-    let mut a: u32;
-    let mut b: u32;
-    let mut c: u32;
-    let coeffs: [u32; 2];
+fn get_coeffs(p: &BigUint) -> [BigUint; 2] {
+    let mut a: BigUint;
+    let mut b: BigUint;
+    let mut c: BigUint;
+    let coeffs: [BigUint; 2];
     loop {
-        a = rand::thread_rng().gen_range(0..*p);
-        b = rand::thread_rng().gen_range(0..*p);
-        c = 4*a.pow(3) + 27*b.pow(2);
+        a = rand::thread_rng().gen_biguint_range(&BigUint::zero(), &p.clone());
+        b = rand::thread_rng().gen_biguint_range(&BigUint::zero(), &p.clone());
+        c = (4_u32)*BigUint::pow(&a, 3_u32) + (27_u32)*BigUint::pow(&b, 2_u32);
 
-        if c % p != 0 {
+        if !(c % p.clone()).is_zero() {
             coeffs = [a, b];
             return coeffs;
         }
     }
 }
 
-fn get_squares(p: &u32) -> Vec<Vec<u32>> {
+fn get_squares(p: &BigUint) -> Vec<Vec<BigUint>> {
     let mut index: usize;
-    let mut squares: Vec<Vec<u32>> = Vec::new();
-    for _i in 0..*p {
+    let mut squares: Vec<Vec<BigUint>> = Vec::new();
+    let mut i: BigUint = BigUint::zero();
+    
+    while i < *p {
         squares.push(Vec::new());
+        i += BigUint::from(1_u32);
     }
-    for x in 0..*p {
-        index = ((x as u32).pow(2) % p) as usize;
-        squares[index].push(x as u32);
+    i = BigUint::zero();
+    
+    while i < *p {
+        index = BigUint::modpow(&i, &BigUint::from(2_u32), p).to_usize().unwrap();
+        squares[index].push(i.clone());
+        i += BigUint::from(1_u32);
     }
     squares
 }
 
-fn get_curve(p: &u32, coeffs: [u32; 2], squares: Vec<Vec<u32>>) -> Vec<[u32; 2]> {
+fn get_curve(p: &BigUint, coeffs: [BigUint; 2], squares: Vec<Vec<BigUint>>) -> Vec<[BigUint; 2]> {
     let mut index: usize;
-    let mut curve: Vec<[u32; 2]> = Vec::new();
-    for x in 0..*p {
-        index = (((x as u32).pow(3) + coeffs[0]*(x as u32) + coeffs[1]) % p) as usize;
+    let mut curve: Vec<[BigUint; 2]> = Vec::new();
+    let mut x: BigUint = BigUint::zero();
+
+    while x < *p {
+        index = ((x.pow(3) + coeffs[0].clone()*&x + coeffs[1].clone()) % p).to_usize().unwrap();
         if squares[index].len() > 0 {
             for y in &squares[index] {
-                curve.push([x as u32, *y]);
+                curve.push([x.clone(), (*y).clone()]);
             }
         }
+        x += BigUint::from(1_u32);
     }
     curve
 }
-
-
-
