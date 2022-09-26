@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8"
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2.15"
+primer = { git = "https://github.com/Quin-Darcy/primer", branch = "master"}
