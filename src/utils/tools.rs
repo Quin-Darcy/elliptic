@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(non_snake_case)]
+#![allow(dead_code)]
 use rand::Rng;
 use num_bigint::BigUint;
 use num_traits::cast::ToPrimitive;
