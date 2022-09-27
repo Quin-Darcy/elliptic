@@ -1,9 +1,8 @@
-#![allow(unused_variables)]
 #![allow(non_snake_case)]
-#![allow(dead_code)]
 use rand::Rng;
 use num_bigint::BigUint;
 use num_traits::cast::ToPrimitive;
+
 
 pub fn power(base: u128, exp: u128, p: u128) -> u128 {
     BigUint::from(base).modpow(&BigUint::from(exp), 
