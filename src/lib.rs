@@ -47,49 +47,57 @@ mod tests {
     use super::*;
 
     #[test]
-    fn inv_test() {
-        assert_eq!(utils::tools::inv(3_u128, 13_u128), 9_u128);
+    fn modular_inverse_test() {
+        assert_eq!(3*utils::tools::inv(3, 13) % 13, 1);
+        assert_eq!(5*utils::tools::inv(5, 41) % 41, 1);
     }
 
     #[test]
-    fn mod_sub_test() {
-        assert_eq!(utils::tools::mod_sub(5_u128, 11_u128, 13_u128), 7_u128);
-    }
-
-    #[test]
-    fn add_test() {
-        assert_eq!(utils::tools::add((9_u128, 7_u128), (2_u128, 10_u128), 3_u128, 13_u128), (12_u128, 11_u128));
-    }
-
-    #[test]
-    fn mod_sqrt_test() {
-        let root: u128 = utils::tools::mod_sqrt(12_u128, 13_u128);
-        assert_eq!(utils::tools::power(root, 2_u128, 13_u128), 12_u128);
+    fn modular_subtraction_test() {
+        assert_eq!(utils::tools::mod_sub(5, 11, 13), 7);
+        assert_eq!(utils::tools::mod_sub(9, 2, 41), 7);
     }
 
     #[test]
     fn quadriatic_residue_test() {
-        assert_eq!(utils::tools::quadratic_residue(12_u128, 13_u128), true);
+        assert_eq!(utils::tools::quadratic_residue(12, 13), true);
     }
 
     #[test]
     fn tonelli_shanks_test() {
-        assert_eq!(utils::tools::tonelli_shanks(12_u128, 13_u128), 5_u128);
+        let root: u128 = utils::tools::tonelli_shanks(5, 41);
+        assert_eq!(root == 13 || root == 28, true);
     }
 
     #[test]
-    fn coeffs_test() {
-        let coeffs: (u128, u128) = utils::tools::get_coeffs(13_u128);
-        let term: u128 = 4*utils::tools::power(coeffs.0, 3_u128, 13_u128)+27*utils::tools::power(coeffs.1, 2_u128, 13_u128);
-        assert_eq!(term % 13_u128 == 0, false);
+    fn modular_square_root_test() {
+        let root: u128 = utils::tools::mod_sqrt(12, 13);
+        assert_eq!(utils::tools::power(root, 2, 13), 12);
     }
 
     #[test]
-    fn curve_point_test() {
-        let curve_coeffs: (u128, u128) = utils::tools::get_coeffs(13_u128);
-        let point: (u128, u128) = get_curve_point(curve_coeffs, 13_u128);
-        let lhs: u128 = utils::tools::power(point.1, 2_u128, 13_u128);
-        let rhs: u128 = utils::tools::power(point.0, 3_u128, 13_u128)+curve_coeffs.0*point.0+curve_coeffs.1;
-        assert_eq!(lhs, rhs);
+    fn elliptic_curve_addition_test() {
+        assert_eq!(utils::tools::add((9, 7), (2, 10), 3, 13), (12, 11));
+        assert_eq!(utils::tools::add((17, 11), (39, 24), 17, 41), (10, 36));
+    }
+
+    #[test]
+    fn elliptic_curve_coefficients_test() {
+        let coeffs: (u128, u128) = utils::tools::get_coeffs(13);
+        let term: u128 = 4*utils::tools::power(coeffs.0, 3, 13)
+            +27*utils::tools::power(coeffs.1, 2, 13);
+        
+        assert_eq!(term % 13 == 0, false);
+    }
+
+    #[test]
+    fn elliptic_curve_point_test() {
+        let curve_coeffs: (u128, u128) = utils::tools::get_coeffs(13);
+        let point: (u128, u128) = get_curve_point(curve_coeffs, 13);
+        let lhs: u128 = utils::tools::power(point.1, 2, 13);
+        let rhs: u128 = utils::tools::power(point.0, 3, 13)
+            +curve_coeffs.0*point.0+curve_coeffs.1;
+        
+        assert_eq!(lhs, rhs % 13);
     }
 }

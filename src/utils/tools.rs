@@ -119,7 +119,7 @@ pub fn tonelli_shanks(n: u128, p: u128) -> u128 {
             b = power(c, power(2_u128, m-(i as u128)-1, p), p);
             m = i as u128;
             c = power(b, 2_u128, p);
-            t = t*power(b, 2_u128, p);
+            t = t*power(b, 2_u128, p) % p;
             r = r*b % p;
         }
     }
