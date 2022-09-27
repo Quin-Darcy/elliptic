@@ -17,34 +17,6 @@ pub fn mod_sub(a: u128, b: u128, p: u128) -> u128 {
     (a+(p-(b % p))) % p
 }
 
-pub fn add(P: (u128, u128), Q: (u128, u128), a: u128, p: u128) -> (u128, u128) {
-    let x1: u128 = P.0; let y1: u128 = P.1;
-    let x2: u128 = Q.0; let y2: u128 = Q.1;
-    let x3: u128; let y3: u128;
-    let lambda: u128;
-
-    if x1 == p || y1 == p {
-        return (x2, y2);
-    } 
-    if x2 == p || y2 == p {
-        return (x1, y1);
-    }
-    if x1 == x2 && y1 == p-y2 {
-        return (p, p);
-    }
-
-    if x1 == x2 && y1 == y2 {
-        lambda = ((3*power(x1, 2, p)+a)*inv(2*y1, p)) % p;
-    } else {
-        lambda = (mod_sub(y2, y1, p)*inv(mod_sub(x2, x1, p), p)) % p;
-    }
-
-    x3 = mod_sub(power(lambda, 2, p), x1+x2, p); 
-    y3 = mod_sub(lambda*mod_sub(x1, x3, p), y1, p);
-
-    (x3, y3)
-}
-
 // This function returns one of the square roots of z over F_p.
 pub fn mod_sqrt(z: u128, p: u128) -> u128 {
     // Multiples of p only have 0 as its roots
@@ -122,21 +94,4 @@ pub fn tonelli_shanks(n: u128, p: u128) -> u128 {
             r = r*b % p;
         }
     }
-}
-
-// Returns valid coefficients for an elliptic curve E: y^2 = x^3 + Ax + B
-// such that 4A^3 + 27B^2 != 0 (mod p).
-pub fn get_coeffs(p: u128) -> (u128, u128) {
-    let mut a: u128 = rand::thread_rng().gen_range(0..p);
-    let mut b: u128 = rand::thread_rng().gen_range(0..p);
-
-    loop {
-        if (4*a.pow(3_u32) + 27*b.pow(2_u32)) % p != 0 {
-            break;
-        } else {
-            a = rand::thread_rng().gen_range(0..p);
-            b = rand::thread_rng().gen_range(0..p);
-        }
-    }
-    (a, b)
 }
