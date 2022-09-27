@@ -9,7 +9,7 @@ pub fn power(base: u128, exp: u128, p: u128) -> u128 {
                                &BigUint::from(p)).to_u128() .unwrap()
 }
 
-pub fn inv(a: u128, p: u128) -> u128 {
+pub fn mod_inv(a: u128, p: u128) -> u128 {
     power(a, p-2, p)
 }
 
