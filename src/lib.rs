@@ -50,7 +50,7 @@ pub fn get_ec_coeffs(p: u128) -> (u128, u128) {
 
 // Given a prime p and coefficients (A, B) which define an elliptic curve E: x^3 + Ax^2 + B,
 // this function returns a point on this curve.
-pub fn get_curve_point(curve_coeffs: (u128, u128), p: u128) -> (u128, u128) {
+pub fn get_ec_point(curve_coeffs: (u128, u128), p: u128) -> (u128, u128) {
     let mut x: u128;
     let mut y: u128;
     let mut z: u128;
@@ -140,7 +140,7 @@ mod tests {
     #[test]
     fn elliptic_curve_point_test() {
         let curve_coeffs: (u128, u128) = get_ec_coeffs(13);
-        let point: (u128, u128) = get_curve_point(curve_coeffs, 13);
+        let point: (u128, u128) = get_ec_point(curve_coeffs, 13);
         let lhs: u128 = utils::power(point.1, 2, 13);
         let rhs: u128 = utils::power(point.0, 3, 13)
             +curve_coeffs.0*point.0+curve_coeffs.1;
