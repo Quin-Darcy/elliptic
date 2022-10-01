@@ -119,25 +119,26 @@ mod tests {
         assert_eq!(ec_add(&tup1, &tup2, &BigUint::from(3_u32), &BigUint::from(13_u32)), (BigUint::from(12_u32), BigUint::from(11_u32)));
         assert_eq!(ec_add(&tup3, &tup4, &BigUint::from(17_u32), &BigUint::from(41_u32)), (BigUint::from(10_u32), BigUint::from(36_u32)));
     }
-/*
+
     #[test]
     fn elliptic_curve_coefficients_test() {
         let coeffs: (BigUint, BigUint) = get_ec_coeffs(&BigUint::from(13_u32));
-        let term: u128 = 4*utils::power(coeffs.0, 3, 13)
-            +27*utils::power(coeffs.1, 2, 13);
+        let term: BigUint = 4_u32*(coeffs.0).modpow(&BigUint::from(3_u32), &BigUint::from(13_u32))
+                            +27_u32*(coeffs.1).modpow(&BigUint::from(2_u32), &BigUint::from(13_u32));
+        //let term: u128 = 4*utils::power(coeffs.0, 3, 13)
+        //    +27*utils::power(coeffs.1, 2, 13);
         
-        assert_eq!(term % 13 == 0, false);
+        assert_eq!((term % 13_u32).is_zero(), false);
     }
 
     #[test]
     fn elliptic_curve_point_test() {
-        let curve_coeffs: (BigUint, BigUint) = get_ec_coeffs(BigUint::from(13_u32));
-        let point: (BigUint, BigUint) = get_ec_point(&curve_coeffs, 13);
-        let lhs: u128 = utils::power(point.1, 2, 13);
-        let rhs: u128 = utils::power(point.0, 3, 13)
-            +curve_coeffs.0*point.0+curve_coeffs.1;
+        let curve_coeffs: (BigUint, BigUint) = get_ec_coeffs(&BigUint::from(13_u32));
+        let point: (BigUint, BigUint) = get_ec_point(&curve_coeffs, &BigUint::from(13_u32));
+        let lhs: BigUint = (point.1).modpow(&BigUint::from(2_u32), &BigUint::from(13_u32));
+        let rhs: BigUint = (point.0).modpow(&BigUint::from(3_u32), &BigUint::from(13_u32))
+                            +curve_coeffs.0*point.0+curve_coeffs.1;
         
-        assert_eq!(lhs, rhs % 13);
+        assert_eq!(lhs, rhs % 13_u32);
     }
-*/
 }
