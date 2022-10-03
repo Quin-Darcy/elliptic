@@ -6,7 +6,22 @@ use num_bigint::{BigUint, RandBigInt};
 mod utils;
 
 
-pub fn ec_add(P: &(BigUint, BigUint), Q: &(BigUint, BigUint), a: &BigUint, p: &BigUint) -> (BigUint, BigUint) {
+fn ec_scalar_mult(k: &BigUint, P: &(BigUint, BigUint), a: &BigUint, p: &BigUint) -> (BigUint, BigUint) {
+    let bit_str: String = format!("{:b}", k).to_string();
+    let bit_chars: Vec<char> = bit_str.chars().collect::<Vec<_>>();
+    let mut q: (BigUint, BigUint) = P.clone();
+    
+    let l: usize = bit_chars.len();
+    for i in 1..l {
+        q = ec_add(&q, &q, a, p);
+        if bit_chars[i] == '1' {
+            q = ec_add(&q, P, a, p);
+        }
+    }
+    q
+}
+
+fn ec_add(P: &(BigUint, BigUint), Q: &(BigUint, BigUint), a: &BigUint, p: &BigUint) -> (BigUint, BigUint) {
     let x1: &BigUint = &P.0; let y1: &BigUint = &P.1;
     let x2: &BigUint = &Q.0; let y2: &BigUint = &Q.1;
     let x3: BigUint; let y3: BigUint;
@@ -76,6 +91,22 @@ pub fn get_ec_point(curve_coeffs: &(BigUint, BigUint), p: &BigUint) -> (BigUint,
     (x, y)
 }
 
+pub fn ec_point_order(P: &(BigUint, BigUint), a: &BigUint, p: &BigUint) -> BigUint {
+    let mut scalar: BigUint = BigUint::from(1_u32);
+    let mut current_multiple: (BigUint, BigUint);
+    let zero: (BigUint, BigUint) = (p.clone(), p.clone());
+
+    loop {
+        current_multiple = ec_scalar_mult(&scalar, P, a, p);
+        if current_multiple == zero || scalar >= 2_u32*p+1_u32 {
+            break;
+        } else {
+            scalar += 1_u32;
+        }
+    }
+    scalar
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -121,6 +152,16 @@ mod tests {
     }
 
     #[test]
+    fn elliptic_curve_scalar_multiplication_test() {
+        let point: (BigUint, BigUint) = (BigUint::from(2_u32), BigUint::from(10_u32));
+        let scalar: BigUint = BigUint::from(5_u32);
+        let coeff: BigUint = BigUint::from(3_u32);
+        let p: BigUint = BigUint::from(13_u32);
+
+        assert_eq!(ec_scalar_mult(&scalar, &point, &coeff, &p), (BigUint::from(1_u32), BigUint::from(5_u32)));
+    }
+
+    #[test]
     fn elliptic_curve_coefficients_test() {
         let coeffs: (BigUint, BigUint) = get_ec_coeffs(&BigUint::from(13_u32));
         let term: BigUint = 4_u32*(coeffs.0).modpow(&BigUint::from(3_u32), &BigUint::from(13_u32))
@@ -140,5 +181,16 @@ mod tests {
                             +curve_coeffs.0*point.0+curve_coeffs.1;
         
         assert_eq!(lhs, rhs % 13_u32);
+    }
+
+    #[test]
+    fn elliptic_curve_point_order_test() {
+        let p: BigUint = BigUint::from(41_u32);
+        let curve_coeffs: (BigUint, BigUint) = get_ec_coeffs(&p);
+        let point: (BigUint, BigUint) = get_ec_point(&curve_coeffs, &p);
+        let order: BigUint = ec_point_order(&point, &curve_coeffs.0, &p);
+        let zero: (BigUint, BigUint) = (p.clone(), p.clone());
+
+        assert_eq!(ec_scalar_mult(&order, &point, &curve_coeffs.0, &p), zero);
     }
 }
